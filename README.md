@@ -1,0 +1,1 @@
+# pycord-cog-template-class
