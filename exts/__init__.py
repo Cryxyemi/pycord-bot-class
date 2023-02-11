@@ -1,0 +1,1 @@
+from .database import AioDbClass as database

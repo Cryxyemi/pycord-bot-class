@@ -1,10 +1,28 @@
-# pycord-cog-template-class
+# pycord-bot-class
 
 ## Requirements
-- colorama (pip install colorama)
-- pycord (pip install py-cord)
+
+- [colorama](https://pypi.org/project/colorama/) (pip install colorama)
+- [pycord](https://pypi.org/project/py-cord/) (pip install py-cord)
+- [aiosqlite](https://pypi.org/project/aiosqlite/) (pip install aiosqlite)
+
+## Features
+
+- Load cogs from a directory
+- Load cogs from subdirectorys
+- Add static cogs
+- Async database functions
+- Built-in on_ready event
+- (Coming soon) Built-in error handler
+
+## Bot parameters
+
+- token (String)
+- ready_event (Boolean)
+- debug_logs (Boolean, optional, default False)
 
 ## Example
+
 ```py
 import discord
 
@@ -14,6 +32,7 @@ from BotClass import Bot
 # Create a bot variable
 bot = Bot(
     token="abc123",
+    ready_event=True,
     intents=discord.Intents.default()
 )
 

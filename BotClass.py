@@ -1,4 +1,5 @@
 import os
+
 import discord
 from colorama import Fore
 
@@ -10,26 +11,59 @@ class Bot(discord.Bot):
     def __init__(
         self, 
         token: str,
+        ready_event: bool,
         debug_logs: bool = False,
-        description = None, 
         *args, 
         **options
     ) -> None:
+        description: str = options.get("description", None)
         super().__init__(description, *args, **options)
 
         self._cogs = []
         self.token = token
         self._debug = debug_logs
 
+        # Idk if these works
         self.string_check = lambda x: isinstance(x, str)
         self.list_check = lambda x: isinstance(x, list)
         self.type_check = lambda type, x: isinstance(x, type)
-
+        
+        if ready_event:
+            self.add_listener(self.connect_event, "on_connect")
+            self.add_listener(self.ready_event, "on_ready")
+        
+    async def connect_event(self) -> None:
+        print(f"Connected to discord API")
+        
+    async def ready_event(self) -> None:
+        infos = [
+            f"User: {self.user.name}#{self.user.discriminator}",
+            f"ID: {self.user.id}",
+            f"Commands: {len(self.commands)}",
+            f"Guilds: {len(self.guilds)}",
+            f"Users: {len(self.users)}",
+            f"Latency: {round(self.latency * 1000)}ms",
+            f"Debug: {self._debug}"
+        ]
+        
+        longest = max([str(i) for i in infos], key=len)
+        longest_len = len(longest)
+        print_length = 4 + longest_len
+        
+        print("\n")
+        print(f"╔{(print_length - 2) * '═'}╗")
+        
+        for value in infos:
+            print(f"║ {self.format_string(value, longest_len)} ║")
+            
+        print(f"╚{(print_length - 2) * '═'}╝")
+        
+        
     def registered_cogs(self) -> list:
         return self._cogs
 
     def exec(self) -> None:
-        self._register_cogs(self._cogs)
+        self._register_cogs()
 
         self.run(self.token)
 
@@ -98,7 +132,7 @@ class Bot(discord.Bot):
 
         self._cogs.clear()
 
-    def _register_cogs(self, cogs: list) -> None:
+    def _register_cogs(self) -> None:
         try:
             for cog in self._cogs:
                 if self._debug:
@@ -107,3 +141,12 @@ class Bot(discord.Bot):
 
         except Exception as e:
             raise LoadError(e)
+
+    def format_string(self, string: str, longest: int) -> str:
+        if type(string) == int:
+            string = str(string)
+            
+        if len(string) > longest:
+            return string
+
+        return f"{string}{(longest - len(string)) * ' '}"
