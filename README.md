@@ -13,12 +13,13 @@
 - Add static cogs
 - Async database functions
 - Built-in on_ready event
-- (Coming soon) Built-in error handler
+- Built-in error handler
 
 ## Bot parameters
 
 - token (String)
 - ready_event (Boolean)
+- error_handler (Boolean)
 - debug_logs (Boolean, optional, default False)
 
 ## Example
@@ -33,6 +34,7 @@ from BotClass import Bot
 bot = Bot(
     token="abc123",
     ready_event=True,
+    error_handler=True,
     intents=discord.Intents.default()
 )
 

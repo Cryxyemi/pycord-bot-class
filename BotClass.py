@@ -1,6 +1,8 @@
 import os
+import traceback
 
 import discord
+from discord.ext import commands
 from colorama import Fore
 
 from .exceptions import LoadError, PathError
@@ -12,6 +14,7 @@ class Bot(discord.Bot):
         self, 
         token: str,
         ready_event: bool,
+        error_handler: bool,
         debug_logs: bool = False,
         *args, 
         **options
@@ -31,6 +34,228 @@ class Bot(discord.Bot):
         if ready_event:
             self.add_listener(self.connect_event, "on_connect")
             self.add_listener(self.ready_event, "on_ready")
+            
+        if error_handler:
+            self.add_listener(self.command_error, "on_command_error")
+            self.add_listener(self.application_command_error, "on_application_command_error")
+
+    async def application_command_error(self, ctx: discord.ApplicationContext, error: discord.DiscordException):
+        if isinstance(error, commands.BotMissingPermissions):
+            await ctx.send("I don't have the permission to do that!")
+
+        elif isinstance(error, commands.BotMissingRole):
+            await ctx.send("I don't have the required role to do that!")
+        
+        elif isinstance(error, commands.MissingRole):
+            await ctx.send("You don't have the required role to do that!", ephemeral=True)
+
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.send("You don't have the permission to do that!", ephemeral=True)
+
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("You're missing a required argument!", ephemeral=True)
+
+        elif isinstance(error, commands.CommandNotFound):
+            await ctx.send("That command doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f"Command on cooldown! Try again in {error.retry_after:.2f} seconds.", ephemeral=True)
+
+        elif isinstance(error, commands.DisabledCommand):
+            await ctx.send("That command is disabled!", ephemeral=True)
+
+        elif isinstance(error, commands.NotOwner):
+            await ctx.send("You're not the owner of this bot!", ephemeral=True)
+
+        elif isinstance(error, commands.NoPrivateMessage):
+            await ctx.send("That command can't be used in DMs!", ephemeral=True)
+
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send("You don't have the permission to do that!", ephemeral=True)
+
+        elif isinstance(error, commands.CommandInvokeError):
+            e = "".join(traceback.format_exception(error, error, error.__traceback__))
+
+            embed = discord.Embed(
+                title="**Error**",
+                description=f"```{e}```",
+                colour=discord.Colour.red()
+            )
+
+            await ctx.respond(embed=embed)
+
+        elif isinstance(error, commands.UserInputError):
+            await ctx.send("Invalid input!", ephemeral=True)
+
+        elif isinstance(error, commands.CommandError):
+            e = "".join(traceback.format_exception(error, error, error.__traceback__))
+
+            embed = discord.Embed(
+                title="**Error**",
+                description=f"```{e}```",
+                colour=discord.Colour.red()
+            )
+
+            await ctx.respond(embed=embed)
+
+        elif isinstance(error, commands.GuildNotFound):
+            await ctx.send("That guild doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.ChannelNotFound):
+            await ctx.send("That channel doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.RoleNotFound):
+            await ctx.send("That role doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.MemberNotFound):
+            await ctx.send("That member doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.UserNotFound):
+            await ctx.send("That user doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.EmojiNotFound):
+            await ctx.send("That emoji doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.MessageNotFound):
+            await ctx.send("That message doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.ChannelNotReadable):
+            await ctx.send("I can't read that channel!", ephemeral=True)
+
+        elif isinstance(error, commands.BadArgument):
+            await ctx.send("Invalid argument!", ephemeral=True)
+
+        elif isinstance(error, commands.BadUnionArgument):
+            await ctx.send("Invalid argument!", ephemeral=True)
+
+        elif isinstance(error, commands.ExpectedClosingQuoteError):
+            await ctx.send("Expected closing quote!", ephemeral=True)
+
+        elif isinstance(error, commands.InvalidEndOfQuotedStringError):
+            await ctx.send("Invalid end of quoted string!", ephemeral=True)
+
+        elif isinstance(error, commands.InvalidEndOfNonstringError):
+            await ctx.send("Invalid end of non-string!", ephemeral=True)
+
+        else:
+            e = "".join(traceback.format_exception(error, error, error.__traceback__))
+
+            embed = discord.Embed(
+                title="**Error**",
+                description=f"```{e}```",
+                colour=discord.Colour.red()
+            )
+
+            await ctx.respond(embed=embed)
+
+    async def command_error(self, ctx: discord.ApplicationContext, error: discord.DiscordException):
+        if isinstance(error, commands.BotMissingPermissions):
+            await ctx.send("I don't have the permission to do that!")
+
+        elif isinstance(error, commands.BotMissingRole):
+            await ctx.send("I don't have the required role to do that!")
+        
+        elif isinstance(error, commands.MissingRole):
+            await ctx.send("You don't have the required role to do that!", ephemeral=True)
+
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.send("You don't have the permission to do that!", ephemeral=True)
+
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("You're missing a required argument!", ephemeral=True)
+
+        elif isinstance(error, commands.CommandNotFound):
+            await ctx.send("That command doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f"Command on cooldown! Try again in {error.retry_after:.2f} seconds.", ephemeral=True)
+
+        elif isinstance(error, commands.DisabledCommand):
+            await ctx.send("That command is disabled!", ephemeral=True)
+
+        elif isinstance(error, commands.NotOwner):
+            await ctx.send("You're not the owner of this bot!", ephemeral=True)
+
+        elif isinstance(error, commands.NoPrivateMessage):
+            await ctx.send("That command can't be used in DMs!", ephemeral=True)
+
+        elif isinstance(error, commands.CheckFailure):
+            await ctx.send("You don't have the permission to do that!", ephemeral=True)
+
+        elif isinstance(error, commands.CommandInvokeError):
+            e = "".join(traceback.format_exception(error, error, error.__traceback__))
+
+            embed = discord.Embed(
+                title="**Error**",
+                description=f"```{e}```",
+                colour=discord.Colour.red()
+            )
+
+            await ctx.respond(embed=embed)
+
+        elif isinstance(error, commands.UserInputError):
+            await ctx.send("Invalid input!", ephemeral=True)
+
+        elif isinstance(error, commands.CommandError):
+            e = "".join(traceback.format_exception(error, error, error.__traceback__))
+
+            embed = discord.Embed(
+                title="**Error**",
+                description=f"```{e}```",
+                colour=discord.Colour.red()
+            )
+
+            await ctx.respond(embed=embed)
+
+        elif isinstance(error, commands.GuildNotFound):
+            await ctx.send("That guild doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.ChannelNotFound):
+            await ctx.send("That channel doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.RoleNotFound):
+            await ctx.send("That role doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.MemberNotFound):
+            await ctx.send("That member doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.UserNotFound):
+            await ctx.send("That user doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.EmojiNotFound):
+            await ctx.send("That emoji doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.MessageNotFound):
+            await ctx.send("That message doesn't exist!", ephemeral=True)
+
+        elif isinstance(error, commands.ChannelNotReadable):
+            await ctx.send("I can't read that channel!", ephemeral=True)
+
+        elif isinstance(error, commands.BadArgument):
+            await ctx.send("Invalid argument!", ephemeral=True)
+
+        elif isinstance(error, commands.BadUnionArgument):
+            await ctx.send("Invalid argument!", ephemeral=True)
+
+        elif isinstance(error, commands.ExpectedClosingQuoteError):
+            await ctx.send("Expected closing quote!", ephemeral=True)
+
+        elif isinstance(error, commands.InvalidEndOfQuotedStringError):
+            await ctx.send("Invalid end of quoted string!", ephemeral=True)
+
+        elif isinstance(error, commands.InvalidEndOfNonstringError):
+            await ctx.send("Invalid end of non-string!", ephemeral=True)
+
+        else:
+            e = "".join(traceback.format_exception(error, error, error.__traceback__))
+
+            embed = discord.Embed(
+                title="**Error**",
+                description=f"```{e}```",
+                colour=discord.Colour.red()
+            )
+
+            await ctx.respond(embed=embed)
         
     async def connect_event(self) -> None:
         print(f"Connected to discord API")
@@ -57,7 +282,6 @@ class Bot(discord.Bot):
             print(f"║ {self.format_string(value, longest_len)} ║")
             
         print(f"╚{(print_length - 2) * '═'}╝")
-        
         
     def registered_cogs(self) -> list:
         return self._cogs
