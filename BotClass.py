@@ -37,11 +37,11 @@ class Bot(discord.Bot):
         
     async def ready_event(self) -> None:
         infos = [
+            f"Pycord version: {discord.__version__}"
             f"User: {self.user.name}#{self.user.discriminator}",
             f"ID: {self.user.id}",
             f"Commands: {len(self.commands)}",
             f"Guilds: {len(self.guilds)}",
-            f"Users: {len(self.users)}",
             f"Latency: {round(self.latency * 1000)}ms",
             f"Debug: {self._debug}"
         ]
